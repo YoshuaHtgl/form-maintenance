@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Report Preventive Maintenance</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; background: #f8f9fa; }
+    table { border-collapse: collapse; width: 100%; background: white; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+    th { background: #007bff; color: white; position: sticky; top: 0; }
+    tr:nth-child(even) { background-color: #f2f2f2; }
+    .status-dot {
+      display: inline-block;
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      margin-right: 6px;
+    }
+    .outstanding { background-color: red; }
+    .selesai { background-color: green; }
+    .ok { background-color: blue; }
+  </style>
+</head>
+<body>
+  <h2>Report Preventive Maintenance</h2>
+  <table id="dataTable">
+    <thead id="tableHead"></thead>
+    <tbody id="tableBody"></tbody>
+  </table>
+
+  <script>
+    const SHEET_ID = "1anTSTnWjDL3X1Gz6lm2a2M0kMIBt20E9AA20PZ3uNUA";
+    const SHEET_NAME = "Sheet1"; // <== GANTI sesuai nama tab di GSheet kamu
+    const URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(SHEET_NAME)}`;
+
+    fetch(URL)
+      .then(r => r.text())
+      .then(t => {
+        const start = t.indexOf('{');
+        const end = t.lastIndexOf('}') + 1;
+        const json = JSON.parse(t.substring(start, end));
+        const table = json.table;
+
+        const thead = document.getElementById("tableHead");
+        const tbody = document.getElementById("tableBody");
+
+        // Buat header
+        let headHTML = "<tr>";
+        table.cols.forEach(c => { headHTML += `<th>${c.label}</th>`; });
+        headHTML += "</tr>";
+        thead.innerHTML = headHTML;
+
+        // Buat isi tabel
+        tbody.innerHTML = "";
+        table.rows.forEach(r => {
+          let rowHTML = "<tr>";
+          r.c.forEach(cell => {
+            let val = cell ? cell.v : "";
+            if (typeof val === "string") {
+              const v = val.toUpperCase();
+              if (v.includes("OUTSTANDING")) val = `<span class='status-dot outstanding'></span>${val}`;
+              else if (v.includes("SELESAI")) val = `<span class='status-dot selesai'></span>${val}`;
+              else if (v.includes("OK NO ISSUE")) val = `<span class='status-dot ok'></span>${val}`;
+            }
+            rowHTML += `<td>${val}</td>`;
+          });
+          rowHTML += "</tr>";
+          tbody.innerHTML += rowHTML;
+        });
+      })
+      .catch(e => {
+        console.error("Gagal ambil data:", e);
+        alert("Tidak bisa membaca data dari sheet. Cek console (Ctrl+Shift+I → Console)");
+      });
+  </script>
+</body>
+</html>
