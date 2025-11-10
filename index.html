@@ -2,34 +2,69 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>Report Preventive Maintenance Yoshua jkaldfds</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Report Preventive Maintenance</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 20px; background: #f8f9fa; }
-    table { border-collapse: collapse; width: 100%; background: white; }
-    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-    th { background: #007bff; color: white; position: sticky; top: 0; }
-    tr:nth-child(even) { background-color: #f2f2f2; }
-    .status-dot {
-      display: inline-block;
-      width: 10px; height: 10px;
-      border-radius: 50%;
-      margin-right: 6px;
+    body {
+      font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+      background: #eef2f7;
+      padding: 20px;
     }
-    .outstanding { background-color: red; }
-    .selesai { background-color: green; }
-    .ok { background-color: blue; }
+    h2 { text-align: center; margin-bottom: 15px; color: #222; }
+    .table-container {
+      overflow: auto; max-height: 80vh;
+      border-radius: 10px; background: white;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    table { border-collapse: collapse; width: 100%; min-width: 900px; }
+    th, td {
+      border: 1px solid #e0e0e0;
+      padding: 8px 10px;
+      white-space: nowrap;
+      text-align: left;
+      font-size: 0.9rem;
+    }
+    th {
+      background: linear-gradient(90deg,#007bff,#0056b3);
+      color: white; position: sticky; top: 0;
+      z-index: 2;
+    }
+    td:first-child, th:first-child {
+      position: sticky; left: 0; background: #28a745;
+      color: white; z-index: 3; font-weight: 600;
+    }
+    tr:nth-child(even){background:#f9fafb;}
+    tr:hover { background: #eaf4ff; transition:0.2s; }
+
+    .status-dot {
+      display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;
+    }
+    .outstanding {background-color:#e74c3c;}
+    .selesai {background-color:#2ecc71;}
+    .ok {background-color:#3498db;}
+    .editable {
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .editable:hover {
+      background: #fff0e6;
+    }
   </style>
 </head>
 <body>
-  <h2>Report Preventive Maintenancesdsdasda</h2>
-  <table id="dataTable">
-    <thead id="tableHead"></thead>
-    <tbody id="tableBody"></tbody>
-  </table>
+  <h2>Report Preventive Maintenance</h2>
+
+  <div class="table-container">
+    <table id="dataTable">
+      <thead id="tableHead"></thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
 
   <script>
     const SHEET_ID = "1anTSTnWjDL3X1Gz6lm2a2M0kMIBt20E9AA20PZ3uNUA";
-    const SHEET_NAME = "Sheet1"; // <== GANTI sesuai nama tab di GSheet kamu
+    const SHEET_NAME = "Sheet1";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwbJTTY3o7TL70vcYI-CaUOJQm-yU00WUtq03LYbYrZYXxsXROsO8ktDwBoXx6R0odUdA/exec"; 
     const URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(SHEET_NAME)}`;
 
     fetch(URL)
@@ -40,40 +75,64 @@
         const json = JSON.parse(t.substring(start, end));
         const table = json.table;
 
+        const headers = table.cols.map(c => c.label);
         const thead = document.getElementById("tableHead");
         const tbody = document.getElementById("tableBody");
 
-        // Buat header
+        // Header
         let headHTML = "<tr>";
-        table.cols.forEach(c => { headHTML += `<th>${c.label}</th>`; });
+        headers.forEach(h => headHTML += `<th>${h}</th>`);
         headHTML += "</tr>";
         thead.innerHTML = headHTML;
 
-        // Buat isi tabel
+        // Isi tabel
         tbody.innerHTML = "";
-        table.rows.forEach(r => {
+        table.rows.forEach((r, rowIndex) => {
           let rowHTML = "<tr>";
-          r.c.forEach(cell => {
-            let val = cell ? cell.v : "";
+          headers.forEach((_, colIndex) => {
+            let cell = r.c[colIndex];
+            let val = cell && cell.v !== undefined ? cell.v : "";
+
+            // Interaktif edit untuk kolom status
+            let isEditable = false;
             if (typeof val === "string") {
               const v = val.toUpperCase();
-              if (v.includes("OUTSTANDING")) val = `<span class='status-dot outstanding'></span>${val}`;
-              else if (v.includes("SELESAI")) val = `<span class='status-dot selesai'></span>${val}`;
-              else if (v.includes("OK NO ISSUE")) val = `<span class='status-dot ok'></span>${val}`;
+              if (v.includes("OUTSTANDING") || v.includes("SELESAI") || v.includes("OK NO ISSUE")) {
+                isEditable = true;
+                if (v.includes("OUTSTANDING")) val = `<span class='status-dot outstanding'></span>${val}`;
+                else if (v.includes("SELESAI")) val = `<span class='status-dot selesai'></span>${val}`;
+                else if (v.includes("OK NO ISSUE")) val = `<span class='status-dot ok'></span>${val}`;
+              }
             }
-            rowHTML += `<td>${val}</td>`;
+
+            rowHTML += `<td ${isEditable ? "class='editable' onclick='editCell("+(rowIndex+2)+","+(colIndex+1)+",this)'" : ""}>${val}</td>`;
           });
           rowHTML += "</tr>";
           tbody.innerHTML += rowHTML;
         });
-      })
-      .catch(e => {
-        console.error("Gagal ambil data:", e);
-        alert("Tidak bisa membaca data dari sheet. Cek console (Ctrl+Shift+I → Console)");
       });
+
+    function editCell(row, col, element) {
+      const current = element.innerText.trim();
+      const newVal = prompt("Ubah nilai:", current);
+      if (newVal === null || newVal === current) return;
+
+      fetch(SCRIPT_URL, {
+        method: "POST",
+        body: JSON.stringify({ row, col, value: newVal }),
+        headers: { "Content-Type": "application/json" }
+      })
+      .then(r => r.text())
+      .then(res => {
+        if (res === "OK") {
+          element.innerHTML = newVal;
+          alert("✅ Berhasil diperbarui di Google Sheet!");
+        } else {
+          alert("❌ Gagal update data!");
+        }
+      })
+      .catch(err => alert("Error: " + err));
+    }
   </script>
 </body>
 </html>
-
-
-
