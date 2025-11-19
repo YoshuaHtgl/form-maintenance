@@ -1,142 +1,846 @@
 <!DOCTYPE html>
-<html lang="id">
+<html>
 <head>
-  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Report Preventive Maintenance</title>
+  <meta charset="UTF-8">
+  <title>PM PLC</title>
   <style>
-    body {
-      font-family: 'Segoe UI', Roboto, Arial, sans-serif;
-      background: #eef2f7;
-      padding: 20px;
-    }
-    h2 { text-align: center; margin-bottom: 15px; color: #222; }
-    .table-container {
-      overflow: auto; max-height: 80vh;
-      border-radius: 10px; background: white;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    }
-    table { border-collapse: collapse; width: 100%; min-width: 900px; }
-    th, td {
-      border: 1px solid #e0e0e0;
-      padding: 8px 10px;
-      white-space: nowrap;
-      text-align: left;
-      font-size: 0.9rem;
-    }
-    th {
-      background: linear-gradient(90deg,#007bff,#0056b3);
-      color: white; position: sticky; top: 0;
-      z-index: 2;
-    }
-    td:first-child, th:first-child {
-      position: sticky; left: 0; background: #28a745;
-      color: white; z-index: 3; font-weight: 600;
-    }
-    tr:nth-child(even){background:#f9fafb;}
-    tr:hover { background: #eaf4ff; transition:0.2s; }
+	body {
+	  font-family: Arial, sans-serif;
+	  margin: 0;
+	  padding: 0;
+	  background: #f7f7f7;
+	}
 
-    .status-dot {
-      display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;
+	form {
+	  background: white;
+	  padding: 20px;
+	  border-radius: 10px;
+	  max-width: 100%;
+	  width: 90%;
+	  margin: 20px auto;
+	  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+	}
+
+    label {
+      display: block;
+      margin-top: 10px;
     }
-    .outstanding {background-color:#e74c3c;}
-    .selesai {background-color:#2ecc71;}
-    .ok {background-color:#3498db;}
-    .editable {
-      cursor: pointer;
-      transition: background 0.2s;
+
+    input, textarea, select {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
     }
-    .editable:hover {
-      background: #fff0e6;
+
+    .inline-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
+
+    .inline-group select {
+      flex: 1;
+    }
+
+	button {
+	  width: 100%;
+	  padding: 12px;
+	  font-size: 16px;
+	  border: none;
+	  border-radius: 8px;
+	  background-color: #007BFF;
+	  color: white;
+	}
+
+    button:hover {
+      background: #45a049;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+	
+	<!-- untuk ceklist-->
+	.checklist {
+	  margin-top: 5px;
+	  display: flex;
+	  flex-direction: column;
+	  gap: 4px; /* jarak antar baris */
+	}
+
+	.checklist label {
+	  display: flex;
+	  align-items: center; /* sejajarkan vertikal */
+	  gap: 8px; /* jarak antara checkbox dan teks */
+	  margin: 0;
+	  font-weight: normal;
+	  font-size: 0.95rem;
+	  line-height: 1.3;
+	}
+
+	.checklist input[type="checkbox"] {
+	  width: 18px;
+	  height: 18px;
+	  margin: 0;
+	  cursor: pointer;
+	  flex-shrink: 0; /* supaya checkbox tidak berubah ukuran */
+	}
+	
+	h3 {
+	  font-size: 16px; /* samakan dengan label form */
+	  font-weight: bold;
+	  margin-top: 20px;
+	  margin-bottom: 10px;
+	  color: #333;
+	}
+
+	/* Gaya tabel agar konsisten dengan form */
+	#actionTable {
+	  border-collapse: collapse;
+	  width: 100%;
+	  margin-top: 5px;
+	  font-size: 14px; /* sama seperti input */
+	}
+
+	#actionTable th, #actionTable td {
+	  border: 1px solid #ccc;
+	  padding: 8px;
+	  text-align: center;
+	}
+
+	#actionTable th {
+	  background-color: #f2f2f2;
+	  font-weight: bold;
+	}
+
+	#actionTable td:first-child {
+	  text-align: left;
+	  font-weight: normal;
+	}
+	
+	.out-desc {
+	  display: none;
+	}
+	
   </style>
 </head>
 <body>
-  <h2>Report Preventive Maintenance</h2>
 
-  <div class="table-container">
-    <table id="dataTable">
-      <thead id="tableHead"></thead>
-      <tbody id="tableBody"></tbody>
-    </table>
-  </div>
+  <h2>Form Maintenance</h2>
+
+  <form id="maintenanceForm">
+
+	<!-- TANGGAL PELAKSANAAN -->
+	<label>Tanggal Pelaksanaan:</label>
+	<input type="date" name="Tanggal" required>
+
+    <!-- NAMA PIC -->
+    <label>Nama PIC:</label>
+    <select name="NamaPIC" required>
+      <option value="">-- Pilih PIC --</option>
+      <option value="Duta Setyawan">Duta Setyawan</option>
+      <option value="Ertha N.A">Ertha N.A</option>
+      <option value="Arief Nurhidayat">Arief Nurhidayat</option>
+      <option value="Yoshua H">Yoshua H</option>
+	  <option value="Bayu Samudra">Bayu Samudra</option>
+    </select>
+
+    <!-- PLANT dan UNIT sejajar -->
+    <label>PLANT PANEL & UNIT:</label>
+    <div class="inline-group">
+      <select id="PLANT" name="PLANT" required>
+        <option value="">-- Pilih PANEL --</option>
+        <option value="PP1">PP1</option>
+        <option value="PP2">PP2</option>
+		<option value="LOADSHEDDING">LOADSHEDDING</option>
+		<option value="WTP(SWRO)1">WTP(SWRO)1</option>
+		<option value="WTP(SWRO)2">WTP(SWRO)2</option>
+		<option value="WTP(SWRO)3">WTP(SWRO)3</option>
+		<option value="WWTP 2">WWTP 2</option>
+		<option value="WWTP 3">WWTP 3</option>
+		<option value="Jety Crane">Jety Crane</option>
+		<option value="Biodiesel 1">Biodiesel 1</option>
+		<option value="Separator Bio 1">Separator Bio 1</option>
+		<option value="OSBL 1">OSBL 1</option>
+		<option value="Biodiesel 2">Biodiesel 2</option>
+		<option value="Separator Bio 2">Separator Bio 2</option>
+		<option value="OSBL 2">OSBL 2</option>
+		<option value="Refinery 1">Refinery 1</option>
+		<option value="Refinery 2">Refinery 2</option>
+		<option value="Refinery 3">Refinery 3</option>
+		<option value="Refinery 4">Refinery 4</option>
+		<option value="Ilogs">Ilogs</option>
+		<option value="Workshop">Workshop</option>
+      </select>
+
+      <select id="UNIT" name="UNIT" style="display:none;">
+        <option value="">-- Pilih UNIT --</option>
+      </select>
+    </div>
+	
+	<!-- Handle Panel -->
+	<label>Panel PLC/IO:</label>
+    <div class="inline-group">
+      <select id="KATEGORY" name="KATEGORY" required>
+        <option value="">-- Pilih KATEGORY --</option>
+        <option value="PLC">PLC</option>
+        <option value="IO">IO</option>
+      </select>
+
+      <select id="BRAND" name="BRAND" style="display:none;">
+        <option value="">-- Pilih BRAND --</option>
+      </select>
+    </div>
+	
+	<!-- Kategori Handle Panel -->
+	<label>Handle Panel:</label>
+    <div class="inline-group">
+      <select id="HANDLE" name="HANDLE" required>
+        <option value="">-- Kondisi Handle --</option>
+        <option value="Normal">Normal</option>
+        <option value="Tanpa Handle">Tanpa Handle</option>
+		<option value="Handle Rusak">Handle Rusak</option>
+      </select>
+
+      <select id="TOTALHANDLE" name="TOTALHANDLE" style="display:none;">
+        <option value="">-- Jumlah Kerusakan --</option>
+      </select>
+    </div>
+	
+<!-- Kategori Lampu Panel -->
+	<label>Lampu Panel:</label>
+    <div class="inline-group">
+      <select id="LAMPU" name="LAMPU" required>
+        <option value="">-- Kondisi Lampu --</option>
+        <option value="Normal">Normal</option>
+        <option value="Tanpa Lampu">Tanpa Lampu</option>
+		<option value="Lampu Rusak">Lampu Rusak</option>
+      </select>
+
+      <select id="TOTALLAMPU" name="TOTALLAMPU" style="display:none;">
+        <option value="">-- Jumlah Kerusakan --</option>
+      </select>
+    </div>
+	
+	<!-- Kategori fan Panel -->
+	<label>FAN Panel:</label>
+    <div class="inline-group">
+      <select id="FAN" name="FAN" required>
+        <option value="">-- Kondisi FAN --</option>
+        <option value="Normal">Normal</option>
+        <option value="Tanpa FAN">Tanpa FAN</option>
+		<option value="Fan Rusak">Fan Rusak</option>
+      </select>
+
+      <select id="TOTALFAN" name="TOTALFAN" style="display:none;">
+        <option value="">-- Jumlah Kerusakan --</option>
+      </select>
+    </div>
+	
+	<label>Tegangan Input AC(V) :</label>
+	<div class="inline-group">
+	<input type="number" name="AC" placeholder="Tegangan" min="0" step="any" required>
+	<input type="number" name="GND" placeholder="GND Netral" min="0" step="any" required>
+	</div> 
+	
+	<label>Tegangan Output DCV :</label>
+	<div class="inline-group">
+	<input type="number" name="DC" placeholder="Tegangan" min="0" step="any" required>
+	</div> 
+	
+	<label>Temperatur :</label>
+	<input type="number" name="SUHU" placeholder="derajat" min="0" step="any" required>
+	
+	<!-- Wiring PLC -->
+	<label>Wiring Kabel:</label>
+	<div class="inline-group">
+	  <select id="wiringStatus" name="wiringStatus" required>
+		<option value="">-- Pilih Kondisi Wiring --</option>
+		<option value="Wiring Rapih">Wiring Rapih</option>
+		<option value="Temuan">Temuan</option>
+	  </select>
+	</div>
+
+	<!-- Checklist detail hanya muncul jika pilih "Temuan" -->
+	<div id="wiringTemuanChecklist" class="checklist" style="display:none; margin-top:8px;">
+	  <label><input type="checkbox" name="wiringTemuan" value="Temuan untagname"> Temuan untagname</label>
+	  <label><input type="checkbox" name="wiringTemuan" value="Temuan untagname"> Cable Membentang di luar Duck</label>
+	  <label><input type="checkbox" name="wiringTemuan" value="Cable duck rusak/hilang"> Cable duck rusak/hilang</label>
+	  <label><input type="checkbox" name="wiringTemuan" value="Cable duck rusak/hilang"> Cable I/O Modul Tidak Rapih</label>
+	  <label><input type="checkbox" name="wiringTemuan" value="Kabel I/O overload pada duck"> Kabel I/O overload pada duck</label>
+	  <label><input type="checkbox" name="wiringTemuan" value="Label kabel hilang"> Label kabel hilang</label>
+	</div>
+
+	<!-- Hidden field gabungan -->
+	<input type="hidden" name="wiringGabung" id="wiringGabung">
+
+	<!-- Kategori Alarm PLC/IO -->
+	<label>Alarm PLC/IO:</label>
+      <select id="ALARM" name="ALARM" required>
+        <option value="">-- Kondisi Alarm --</option>
+        <option value="Normal">Normal</option>
+        <option value="Alarm">Alarm</option>
+      </select>
+
+      <select id="JENISALARM" name="JENISALARM" style="display:none;">
+        <option value="">-- deskripsi alarm --</option>
+      </select>
+	  
+	  <div id="deskripsiContainer"></div>
+
+	<h3>ACTION *</h3>
+	<table id="actionTable">
+	  <thead>
+		<tr>
+		  <th style="text-align:left;">ACTION</th>
+		  <th>OK NO ISSUE</th>
+		  <th>SELESAI</th>
+		  <th>OUTSTANDING</th>
+		</tr>
+	  </thead>
+	  <tbody>
+
+		<!-- Cleaning Panel -->
+		<tr>
+		  <td>Cleaning Panel</td>
+		  <td><input type="radio" name="CLEANINGPANEL" value="OK NO ISSUE" data-target="CLEANINGPANEL_DESC"></td>
+		  <td><input type="radio" name="CLEANINGPANEL" value="SELESAI" data-target="CLEANINGPANEL_DESC"></td>
+		  <td><input type="radio" name="CLEANINGPANEL" value="OUTSTANDING" data-target="CLEANINGPANEL_DESC"></td>
+		</tr>
+		<tr id="CLEANINGPANEL_DESC" class="out-desc">
+		  <td colspan="4">
+			<textarea name="CLEANINGPANEL_OUT_DESC" placeholder="Alasan outstanding..."></textarea>
+		  </td>
+		</tr>
+
+		<!-- Cleaning FAN -->
+		<tr>
+		  <td>Cleaning FAN</td>
+		  <td><input type="radio" name="CLEANINGFAN" value="OK NO ISSUE" data-target="CLEANINGFAN_DESC"></td>
+		  <td><input type="radio" name="CLEANINGFAN" value="SELESAI" data-target="CLEANINGFAN_DESC"></td>
+		  <td><input type="radio" name="CLEANINGFAN" value="OUTSTANDING" data-target="CLEANINGFAN_DESC"></td>
+		</tr>
+		<tr id="CLEANINGFAN_DESC" class="out-desc">
+		  <td colspan="4"><textarea name="CLEANINGFAN_OUT_DESC" placeholder="Alasan outstanding..."></textarea></td>
+		</tr>
+
+		<!-- Cleaning Filter -->
+		<tr>
+		  <td>Cleaning Filter</td>
+		  <td><input type="radio" name="CLEANINGFILTER" value="OK NO ISSUE" data-target="CLEANINGFILTER_DESC"></td>
+		  <td><input type="radio" name="CLEANINGFILTER" value="SELESAI" data-target="CLEANINGFILTER_DESC"></td>
+		  <td><input type="radio" name="CLEANINGFILTER" value="OUTSTANDING" data-target="CLEANINGFILTER_DESC"></td>
+		</tr>
+		<tr id="CLEANINGFILTER_DESC" class="out-desc">
+		  <td colspan="4"><textarea name="CLEANINGFILTER_OUT_DESC" placeholder="Alasan outstanding..."></textarea></td>
+		</tr>
+
+		<!-- Tightening -->
+		<tr>
+		  <td>Tightening</td>
+		  <td><input type="radio" name="TIGHTENING" value="OK NO ISSUE" data-target="TIGHTENING_DESC"></td>
+		  <td><input type="radio" name="TIGHTENING" value="SELESAI" data-target="TIGHTENING_DESC"></td>
+		  <td><input type="radio" name="TIGHTENING" value="OUTSTANDING" data-target="TIGHTENING_DESC"></td>
+		</tr>
+		<tr id="TIGHTENING_DESC" class="out-desc">
+		  <td colspan="4"><textarea name="TIGHTENING_OUT_DESC" placeholder="Alasan outstanding..."></textarea></td>
+		</tr>
+
+		<!-- Penggantian Lampu -->
+		<tr>
+		  <td>Penggantian Lampu</td>
+		  <td><input type="radio" name="PENGGANTIAN_LAMPU" value="OK NO ISSUE" data-target="PENGGANTIAN_LAMPU_DESC"></td>
+		  <td><input type="radio" name="PENGGANTIAN_LAMPU" value="SELESAI" data-target="PENGGANTIAN_LAMPU_DESC"></td>
+		  <td><input type="radio" name="PENGGANTIAN_LAMPU" value="OUTSTANDING" data-target="PENGGANTIAN_LAMPU_DESC"></td>
+		</tr>
+		<tr id="PENGGANTIAN_LAMPU_DESC" class="out-desc">
+		  <td colspan="4"><textarea name="PENGGANTIAN_LAMPU_OUT_DESC" placeholder="Alasan outstanding..."></textarea></td>
+		</tr>
+
+		<!-- Penggantian Handle -->
+		<tr>
+		  <td>Penggantian Handle</td>
+		  <td><input type="radio" name="PENGGANTIAN_HANDLE" value="OK NO ISSUE" data-target="PENGGANTIAN_HANDLE_DESC"></td>
+		  <td><input type="radio" name="PENGGANTIAN_HANDLE" value="SELESAI" data-target="PENGGANTIAN_HANDLE_DESC"></td>
+		  <td><input type="radio" name="PENGGANTIAN_HANDLE" value="OUTSTANDING" data-target="PENGGANTIAN_HANDLE_DESC"></td>
+		</tr>
+		<tr id="PENGGANTIAN_HANDLE_DESC" class="out-desc">
+		  <td colspan="4"><textarea name="PENGGANTIAN_HANDLE_OUT_DESC" placeholder="Alasan outstanding..."></textarea></td>
+		</tr>
+
+		<!-- Perbaikan Wiring -->
+		<tr>
+		  <td>Perbaikan Wiring IO/duck</td>
+		  <td><input type="radio" name="PERBAIKAN_WIRING" value="OK NO ISSUE" data-target="PERBAIKAN_WIRING_DESC"></td>
+		  <td><input type="radio" name="PERBAIKAN_WIRING" value="SELESAI" data-target="PERBAIKAN_WIRING_DESC"></td>
+		  <td><input type="radio" name="PERBAIKAN_WIRING" value="OUTSTANDING" data-target="PERBAIKAN_WIRING_DESC"></td>
+		</tr>
+		<tr id="PERBAIKAN_WIRING_DESC" class="out-desc">
+		  <td colspan="4"><textarea name="PERBAIKAN_WIRING_OUT_DESC" placeholder="Alasan outstanding..."></textarea></td>
+		</tr>
+
+		<!-- Cek Alarm PLC -->
+		<tr>
+		  <td>Cek Alarm PLC</td>
+		  <td><input type="radio" name="CEK_ALARM_PLC" value="OK NO ISSUE" data-target="CEK_ALARM_PLC_DESC"></td>
+		  <td><input type="radio" name="CEK_ALARM_PLC" value="SELESAI" data-target="CEK_ALARM_PLC_DESC"></td>
+		  <td><input type="radio" name="CEK_ALARM_PLC" value="OUTSTANDING" data-target="CEK_ALARM_PLC_DESC"></td>
+		</tr>
+		<tr id="CEK_ALARM_PLC_DESC" class="out-desc">
+		  <td colspan="4"><textarea name="CEK_ALARM_PLC_OUT_DESC" placeholder="Alasan outstanding..."></textarea></td>
+		</tr>
+
+		<!-- Cek Tegangan -->
+		<tr>
+		  <td>Cek Tegangan AC,DC</td>
+		  <td><input type="radio" name="CEK_TEGANGAN_PSU" value="OK NO ISSUE" data-target="CEK_TEGANGAN_PSU_DESC"></td>
+		  <td><input type="radio" name="CEK_TEGANGAN_PSU" value="SELESAI" data-target="CEK_TEGANGAN_PSU_DESC"></td>
+		  <td><input type="radio" name="CEK_TEGANGAN_PSU" value="OUTSTANDING" data-target="CEK_TEGANGAN_PSU_DESC"></td>
+		</tr>
+		<tr id="CEK_TEGANGAN_PSU_DESC" class="out-desc">
+		  <td colspan="4"><textarea name="CEK_TEGANGAN_PSU_OUT_DESC" placeholder="Alasan outstanding..."></textarea></td>
+		</tr>
+
+	  </tbody>
+	</table>
+
+	<!-- Tindakan APM -->
+	<label>Tindakan APM:</label>
+	<div class="inline-group">
+	  <select id="tindakanAPM" name="tindakanAPM" required>
+		<option value="">-- Pilih Tindakan --</option>
+		<option value="Tidak ada tindakan">Tidak ada Tindakan</option>
+		<option value="Ada tindakan (APM)">APM</option>
+	  </select>
+	</div>
+
+	<!-- Checklist APM muncul hanya jika pilih "APM" -->
+	<div id="apmChecklist" class="checklist" style="display:none; margin-top:8px;">
+	  <label><input type="checkbox" name="APM" value="Lampu Panel"> Lampu Panel</label>
+	  <label><input type="checkbox" name="APM" value="Wiring IO/duck"> Wiring IO/duck</label>
+	  <label><input type="checkbox" name="APM" value="Fan Cleaning"> Fan Cleaning</label>
+	  <label><input type="checkbox" name="APM" value="Penggantian Fan"> Penggantian Fan</label>
+	  <label><input type="checkbox" name="APM" value="Alarm PLC/IO"> Alarm PLC/IO</label>
+	  <label><input type="checkbox" name="APM" value="Penggantian PSU PLC"> Penggantian PSU PLC</label>
+	  <label><input type="checkbox" name="APM" value="Penggantian PSU IO"> Penggantian PSU IO</label>
+
+	  <!-- Checkbox Lainnya -->
+	  <label><input type="checkbox" id="apmLainnya" name="APM" value="Lainnya"> Lainnya</label>
+	</div>
+
+	<!-- Input tambahan muncul hanya jika pilih “Lainnya” -->
+	<div id="apmLainnyaInput" style="display:none; margin-top:8px;">
+	  <input type="text" id="apmLainnyaText" placeholder="Tuliskan tindakan lainnya..." style="width:100%; padding:6px;">
+	</div>
+
+	<!-- Hidden field untuk menampung hasil gabungan -->
+	<input type="hidden" name="apmGabung" id="apmGabung">
+
+
+    <!-- REPORT PM -->
+    <label>REPORT PM:</label>
+    <textarea name="reportpm" placeholder="Tuliskan Report..." required></textarea>
+
+    <button type="submit" id="submitBtn">Kirim</button>
+  </form>
 
   <script>
-    const SHEET_ID = "1anTSTnWjDL3X1Gz6lm2a2M0kMIBt20E9AA20PZ3uNUA";
-    const SHEET_NAME = "Sheet1";
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyTqgTi4yxMJDkJ0tfK571Q9U0yOJorlUBXK6zrU51b99sBW3ZqkdjiuEWgImpMnXQdhg/exec"; 
-    const URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(SHEET_NAME)}`;
+    const scriptURL = "https://script.google.com/macros/s/AKfycbzfQmVBoLnWe5_B6yy7W7eM05sH5kwlhFYYOkTJ4mAF9CDuI_9p_mWpeTl-v0UKz2EPjg/exec";
+    const form = document.getElementById("maintenanceForm");
+    const submitBtn = document.getElementById("submitBtn");
+    const plantSelect = document.getElementById("PLANT");
+    const unitSelect = document.getElementById("UNIT");
+	const kategorySelect = document.getElementById("KATEGORY");
+	const brandSelect = document.getElementById("BRAND");
+	const handleSelect = document.getElementById("HANDLE");
+	const totalhandleSelect = document.getElementById("TOTALHANDLE");
+	const lampuSelect = document.getElementById("LAMPU");
+	const totallampuSelect = document.getElementById("TOTALLAMPU");
+	const fanSelect = document.getElementById("FAN");
+	const totalfanSelect = document.getElementById("TOTALFAN");
+	const alarmSelect = document.getElementById("ALARM");
+	const jenisalarmSelect = document.getElementById("JENISALARM");
+	const deskripsiContainer = document.getElementById("deskripsiContainer");
+	const apmCheckboxes = document.querySelectorAll('input[name="APM"]');
+	const apmLainnya = document.getElementById("apmLainnya");
+	const apmLainnyaInput = document.getElementById("apmLainnyaInput");
+	const apmLainnyaText = document.getElementById("apmLainnyaText");
+	const wiringSelect = document.getElementById("wiringStatus");
+	const wiringChecklist = document.getElementById("wiringTemuanChecklist");
+	const wiringGabung = document.getElementById("wiringGabung");
+	const tindakanAPM = document.getElementById("tindakanAPM");
+	const apmChecklist = document.getElementById("apmChecklist");
+		
 
-    fetch(URL)
-      .then(r => r.text())
-      .then(t => {
-        const start = t.indexOf('{');
-        const end = t.lastIndexOf('}') + 1;
-        const json = JSON.parse(t.substring(start, end));
-        const table = json.table;
+    // Menampilkan UNIT sesuai PLANT
+    plantSelect.addEventListener("change", () => {
+      const selectedPlant = plantSelect.value;
+      unitSelect.innerHTML = '<option value="">-- Pilih UNIT --</option>'; // reset
 
-        const headers = table.cols.map(c => c.label);
-        const thead = document.getElementById("tableHead");
-        const tbody = document.getElementById("tableBody");
+      if (selectedPlant === "PP1") {
+        unitSelect.innerHTML += '<option value="Boiler">Boiler</option>';
+        unitSelect.innerHTML += '<option value="Turbin">Turbin</option>';
+		unitSelect.innerHTML += '<option value="Dust Remover">Dust Remover C.ROOM </option>';
+		unitSelect.innerHTML += '<option value="Dust Remover">Dust Remover Kanan </option>';
+		unitSelect.innerHTML += '<option value="Dust Remover">Dust Remover Kiri </option>';
+        unitSelect.style.display = "block";
+      } 
+	  else if (selectedPlant === "PP2") {
+        unitSelect.innerHTML += '<option value="Boiler 1.cab1">Boiler 1.cab1</option>';
+		unitSelect.innerHTML += '<option value="Boiler 1.cab2">Boiler 1.cab2</option>';
+		unitSelect.innerHTML += '<option value="Boiler 1.cab3">Boiler 1.cab3</option>';
+        unitSelect.innerHTML += '<option value="Boiler 2.cab1">Boiler 2.cab1</option>';
+		unitSelect.innerHTML += '<option value="Boiler 2.cab2">Boiler 2.cab2</option>';
+		unitSelect.innerHTML += '<option value="Boiler 2.cab3">Boiler 2.cab3</option>';
+		unitSelect.innerHTML += '<option value="Turbin 1.cab1">Turbin 1.cab1</option>';
+		unitSelect.innerHTML += '<option value="Turbin 1.cab2">Turbin 1.cab2</option>';
+		unitSelect.innerHTML += '<option value="Turbin 2.cab1">Turbin 2.cab1</option>';
+		unitSelect.innerHTML += '<option value="Turbin 2.cab2">Turbin 2.cab2</option>';
+		unitSelect.innerHTML += '<option value="ETS 1">ETS 1</option>';
+		unitSelect.innerHTML += '<option value="ETS 2">ETS 2</option>';
+		unitSelect.innerHTML += '<option value="Common DCS">Comm DCS.cab1</option>';
+		unitSelect.innerHTML += '<option value="Common DCS">Comm DCS.cab2</option>';
+		unitSelect.innerHTML += '<option value="Common DCS">Comm DCS.cab3</option>';
+		unitSelect.innerHTML += '<option value="Common Crusher">Common Crusher</option>';
+		unitSelect.innerHTML += '<option value="Common Jety">Common Jety</option>';
+        unitSelect.style.display = "block";
+      } 
 
-        // Header
-        let headHTML = "<tr>";
-        headers.forEach(h => headHTML += `<th>${h}</th>`);
-        headHTML += "</tr>";
-        thead.innerHTML = headHTML;
+	  else if (selectedPlant === "LOADSHEDDING") {
+        unitSelect.innerHTML += '<option value="PP1">PP1</option>';
+        unitSelect.innerHTML += '<option value="PP2">PP2</option>';
+		unitSelect.innerHTML += '<option value="TM GLOBAL">TM GLOBAL</option>';
+        unitSelect.style.display = "block";
+      }
+	  else if (selectedPlant === "WTP(SWRO)2") {
+        unitSelect.innerHTML += '<option value="WTP(SWRO)2">WTP(SWRO)2</option>';
+        unitSelect.innerHTML += '<option value="LAMELA">LAMELA</option>';
+        unitSelect.style.display = "block";
+      }
+	  else if (selectedPlant === "WWTP 2") {
+        unitSelect.innerHTML += '<option value="WWTP 2">WWTP 2</option>';
+        unitSelect.innerHTML += '<option value="AEROBIC">AEROBIC</option>';
+        unitSelect.style.display = "block";
+      }
+	  else if (selectedPlant === "Jety Crane") {
+        unitSelect.innerHTML += '<option value="Traveling Bawah">Traveling Bawah</option>';
+        unitSelect.innerHTML += '<option value="Traveling Atas">Traveling Atas</option>';
+		unitSelect.innerHTML += '<option value="BOOM">BOOM</option>';
+        unitSelect.style.display = "block";
+      }
+	  else if (selectedPlant === "Biodiesel 1") {
+        unitSelect.innerHTML += '<option value="Panel 1">Panel 1</option>';
+        unitSelect.innerHTML += '<option value="Panel 2">Panel 2</option>';
+		unitSelect.innerHTML += '<option value="Panel 3">Panel 3</option>';
+		unitSelect.innerHTML += '<option value="Panel 4">Panel 4</option>';
+        unitSelect.style.display = "block";
+      }
+	  else if (selectedPlant === "Separator Bio 1") {
+        unitSelect.innerHTML += '<option value="75 KV">75 KV</option>';
+        unitSelect.innerHTML += '<option value="150 KV">150 KV</option>';
+        unitSelect.style.display = "block";
+      }
+	  else if (selectedPlant === "Biodiesel 2") {
+        unitSelect.innerHTML += '<option value="Panel 1">Panel 1</option>';
+        unitSelect.innerHTML += '<option value="Panel 2">Panel 2</option>';
+		unitSelect.innerHTML += '<option value="Panel 3">Panel 3</option>';
+		unitSelect.innerHTML += '<option value="Panel 4">Panel 4</option>';
+		unitSelect.innerHTML += '<option value="Panel 5">Panel 5</option>';
+		unitSelect.innerHTML += '<option value="Panel 6">Panel 6</option>';
+        unitSelect.style.display = "block";
+      }
+	  else if (selectedPlant === "OSBL 2") {
+        unitSelect.innerHTML += '<option value="Poims Main">Poims Main</option>';
+        unitSelect.innerHTML += '<option value="FNI 1">FNI 1</option>';
+		unitSelect.innerHTML += '<option value="FNI 2">FNI 2</option>';
+		unitSelect.innerHTML += '<option value="FNI 3">FNI 3</option>';
+		unitSelect.innerHTML += '<option value="FNI 4">FNI 4</option>';
+		unitSelect.innerHTML += '<option value="FNI 5">FNI 5</option>';
+		unitSelect.innerHTML += '<option value="FNI 6">FNI 6</option>';
+        unitSelect.style.display = "block";
+      }
+	  else if (selectedPlant === "Refinery 1") {
+        unitSelect.innerHTML += '<option value="Refinery 1">Refinery 1</option>';
+        unitSelect.innerHTML += '<option value="Frac 1">Frac 1</option>';
+		unitSelect.innerHTML += '<option value="Ice Condensing">Ice Condensing</option>';
+		unitSelect.innerHTML += '<option value="Washing/Sepa">Washing/Sepa</option>';
+        unitSelect.style.display = "block";
+      }
+	  else if (selectedPlant === "Refinery 2") {
+        unitSelect.innerHTML += '<option value="Refinery 2">Refinery 2</option>';
+        unitSelect.innerHTML += '<option value="Frac2 OCC">Frac 2 OCC</option>';
+		unitSelect.innerHTML += '<option value="Frac2 Tengah">Frac2 Tengah </option>';
+		unitSelect.innerHTML += '<option value="Frac2 pinggir">Frac2 pinggir </option>';
+		unitSelect.innerHTML += '<option value="Filter Press A">Filter Press A</option>';
+		unitSelect.innerHTML += '<option value="Filter Press B">Filter Press B</option>';
+		unitSelect.innerHTML += '<option value="Washing/Sepa">Washing/Sepa</option>';
+		unitSelect.innerHTML += '<option value="HPB">HPB</option>';
+        unitSelect.style.display = "block";
+      }
+	  else if (selectedPlant === "Refinery 4") {
+        unitSelect.innerHTML += '<option value="Refinery 4">Refinery 4</option>';
+		unitSelect.innerHTML += '<option value="HPB">HPB</option>';
+        unitSelect.style.display = "block";
+      }
+	  else if (selectedPlant === "Ilogs") {
+        unitSelect.innerHTML += '<option value="WB ABC">WB ABC</option>';
+		unitSelect.innerHTML += '<option value="WB D">WB D</option>';
+		unitSelect.innerHTML += '<option value="WB Belakang">WB Belakang</option>';
+		unitSelect.innerHTML += '<option value="WB Merpati">WB Merpati</option>';
+		unitSelect.innerHTML += '<option value="Water In Oil">Water In Oil</option>';
+        unitSelect.style.display = "block";
+      }
+	  else {
+        unitSelect.style.display = "none";
+      }
+    });
+	
+	 // Menampilkan KATEGORY PANEL PLC / PANEL IO
+    kategorySelect.addEventListener("change", () => {
+      const selectedkategory = kategorySelect.value;
+      brandSelect.innerHTML = '<option value="">-- Pilih kategory --</option>'; // reset
 
-        // Isi tabel
-        tbody.innerHTML = "";
-        table.rows.forEach((r, rowIndex) => {
-          let rowHTML = "<tr>";
-          headers.forEach((_, colIndex) => {
-            let cell = r.c[colIndex];
-            let val = cell && cell.v !== undefined ? cell.v : "";
+      if (selectedkategory === "PLC") {
+        brandSelect.innerHTML += '<option value="Siemens">Siemens</option>';
+        brandSelect.innerHTML += '<option value="Yokogawa">Yokogawa</option>';
+		brandSelect.innerHTML += '<option value="Omron">Omron</option>';
+		brandSelect.innerHTML += '<option value="Glova">Glova</option>';
+        brandSelect.style.display = "block";
+      } 
+	  else {
+        brandSelect.style.display = "none";
+      }
+    });
+	
+	// Menampilkan jumlah kerusakan Handle
+    handleSelect.addEventListener("change", () => {
+      const selectedhandle = handleSelect.value;
+      totalhandleSelect.innerHTML = '<option value="">-- Jumlah Rusak --</option>'; // reset
 
-            // Interaktif edit untuk kolom status
-            let isEditable = false;
-            if (typeof val === "string") {
-              const v = val.toUpperCase();
-              if (v.includes("OUTSTANDING") || v.includes("SELESAI") || v.includes("OK NO ISSUE")) {
-                isEditable = true;
-                if (v.includes("OUTSTANDING")) val = `<span class='status-dot outstanding'></span>${val}`;
-                else if (v.includes("SELESAI")) val = `<span class='status-dot selesai'></span>${val}`;
-                else if (v.includes("OK NO ISSUE")) val = `<span class='status-dot ok'></span>${val}`;
-              }
-            }
+      if (selectedhandle === "Handle Rusak") {
+        totalhandleSelect.innerHTML += '<option value="1">1</option>';
+		totalhandleSelect.innerHTML += '<option value="2">2</option>';
+        totalhandleSelect.innerHTML += '<option value="3">3</option>';
+		totalhandleSelect.innerHTML += '<option value="4">4</option>';
+		totalhandleSelect.innerHTML += '<option value="5">5</option>';
+		totalhandleSelect.innerHTML += '<option value="6">6</option>';
+		totalhandleSelect.innerHTML += '<option value="7">7</option>';
+        totalhandleSelect.style.display = "block";
+      } 
+	  else {
+        totalhandleSelect.style.display = "none";
+      }
+    });
 
-            rowHTML += `<td ${isEditable ? "class='editable' onclick='editCell("+(rowIndex+2)+","+(colIndex+1)+",this)'" : ""}>${val}</td>`;
-          });
-          rowHTML += "</tr>";
-          tbody.innerHTML += rowHTML;
-        });
-      });
+	// Menampilkan jumlah kerusakan Lampu
+    lampuSelect.addEventListener("change", () => {
+      const selectedlampu = lampuSelect.value;
+      totallampuSelect.innerHTML = '<option value="">-- Jumlah Rusak --</option>'; // reset
 
-    function editCell(row, col, element) {
-      const current = element.innerText.trim();
-      const newVal = prompt("Ubah nilai:", current);
-      if (newVal === null || newVal === current) return;
+      if (selectedlampu === "Lampu Rusak") {
+        totallampuSelect.innerHTML += '<option value="1">1</option>';
+		totallampuSelect.innerHTML += '<option value="2">2</option>';
+        totallampuSelect.innerHTML += '<option value="3">3</option>';
+		totallampuSelect.innerHTML += '<option value="4">4</option>';
+		totallampuSelect.innerHTML += '<option value="5">5</option>';
+		totallampuSelect.innerHTML += '<option value="6">6</option>';
+		totallampuSelect.innerHTML += '<option value="7">7</option>';
+		totallampuSelect.style.display = "block";
+		}
+	  else {
+        totallampuSelect.style.display = "none";
+      }
+    });
+	
+	// Menampilkan jumlah kerusakan FAN
+    fanSelect.addEventListener("change", () => {
+      const selectedfan = fanSelect.value;
+      totalfanSelect.innerHTML = '<option value="">-- Jumlah Rusak --</option>'; // reset
 
-      fetch(SCRIPT_URL, {
-        method: "POST",
-        body: JSON.stringify({ row, col, value: newVal }),
-        headers: { "Content-Type": "application/json" }
-      })
-      .then(r => r.text())
-      .then(res => {
-        if (res === "OK") {
-          element.innerHTML = newVal;
-          alert("✅ Berhasil diperbarui di Google Sheet!");
-        } else {
-          alert("❌ Gagal update data!");
-        }
-      })
-      .catch(err => alert("Error: " + err));
-    }
+      if (selectedfan === "Fan Rusak") {
+        totalfanSelect.innerHTML += '<option value="1">1</option>';
+		totalfanSelect.innerHTML += '<option value="2">2</option>';
+        totalfanSelect.innerHTML += '<option value="3">3</option>';
+		totalfanSelect.style.display = "block";
+		}
+	  else {
+        totalfanSelect.style.display = "none";
+      }
+    });
+	
+	// === Wiring PLC Logic ===
+		wiringSelect.addEventListener("change", () => {
+	  if (wiringSelect.value === "Temuan") {
+		wiringChecklist.style.display = "block";
+	  } else {
+		wiringChecklist.style.display = "none";
+		// hapus semua checklist jika bukan Temuan
+		document.querySelectorAll('input[name="wiringTemuan"]').forEach(cb => cb.checked = false);
+	  }
+	});
+	
+	// Menampilkan Deskripsi Alarm
+	alarmSelect.addEventListener("change", () => {
+	  const selectedalarm = alarmSelect.value;
+	  deskripsiContainer.innerHTML = "";
+
+	  // Sembunyikan dropdown deskripsi alarm sepenuhnya
+	  jenisalarmSelect.style.display = "none";
+
+	  if (selectedalarm === "Alarm") {
+		// langsung munculkan textarea deskripsi
+		deskripsiContainer.innerHTML = `
+		  <label for="DESKRIPSI">Deskripsi Alarm:</label>
+		  <textarea id="DESKRIPSI" name="DESKRIPSI"
+			placeholder="Tuliskan deskripsi alarm..." rows="3" required></textarea>
+		`;
+	  }
+	});
+	
+	
+	// === OUTSTANDING UNIVERSAL ===
+	document.querySelectorAll("input[type=radio]").forEach(r=>{
+	  r.addEventListener("change",()=>{
+		const target = document.getElementById(r.dataset.target);
+		if(!target) return;
+
+		if(r.value === "OUTSTANDING"){
+		  target.style.display="table-row";
+		} else {
+		  target.style.display="none";
+		  target.querySelector("textarea").value="";
+		}
+	  });
+	});
+	
+	
+		tindakanAPM.addEventListener("change", () => {
+	  if (tindakanAPM.value === "Ada tindakan (APM)") {
+		apmChecklist.style.display = "block";
+	  } else {
+		apmChecklist.style.display = "none";
+		apmLainnyaInput.style.display = "none";
+		apmLainnyaText.value = "";
+		document.querySelectorAll('input[name="APM"]').forEach(cb => cb.checked = false);
+	  }
+	});
+
+	// === Tampilkan input teks jika “Lainnya” dicentang ===
+	apmLainnya.addEventListener("change", () => {
+	  apmLainnyaInput.style.display = apmLainnya.checked ? "block" : "none";
+	  if (!apmLainnya.checked) apmLainnyaText.value = "";
+	});
+
+	// === Gabungkan hasil APM saat submit ===
+	form.addEventListener("submit", (e) => {
+	  e.preventDefault();
+
+	  // ... (kode lain tetap)
+
+	  // ===== Gabungkan hasil kondisi APM =====
+	  let apmResult = tindakanAPM.value;
+	  if (tindakanAPM.value === "Ada tindakan (APM)") {
+		const apmList = Array.from(document.querySelectorAll('input[name="APM"]:checked')).map(cb => cb.value);
+		if (apmLainnya.checked && apmLainnyaText.value.trim() !== "") {
+		  apmList.push("Lainnya: " + apmLainnyaText.value.trim());
+		}
+		apmResult += ": " + (apmList.length > 0 ? apmList.join(", ") : "Tidak ada checklist dipilih");
+	  }
+	  document.getElementById("apmGabung").value = apmResult;
+
+	  // lanjut kirim data ke Google Sheet seperti sebelumnya...
+	});
+
+
+	// === EVENT SUBMIT UTAMA ===
+form.addEventListener("submit", (e) => {
+  e.preventDefault();
+
+
+  // ===== Gabungkan hasil kondisi Wiring =====
+	let wiringResult = wiringSelect.value;
+	if (wiringResult === "Temuan") {
+	  const temuanList = Array
+		.from(document.querySelectorAll('input[name="wiringTemuan"]:checked'))
+		.map(cb => cb.value);
+	  wiringResult += ": " + (temuanList.length > 0 ? temuanList.join(", ") : "Tidak ada detail temuan");
+	}
+	wiringGabung.value = wiringResult;
+
+  // ===== Nonaktifkan tombol kirim sementara =====
+  submitBtn.disabled = true;
+  submitBtn.textContent = "Mengirim...";
+
+  // ===== Gabungkan dropdown bertingkat =====
+  const plant = plantSelect.value;
+  const unit = unitSelect.value;
+  const combinedPlant = unit ? `${plant} - ${unit}` : plant;
+
+  const kategory = kategorySelect.value;
+  const brand = brandSelect.value;
+  const combinedKategory = brand ? `${kategory} - ${brand}` : kategory;
+
+  const handle = handleSelect.value;
+  const totalhandle = totalhandleSelect.value;
+  const combinedHandle = totalhandle ? `${handle} - ${totalhandle}` : handle;
+
+  const lampu = lampuSelect.value;
+  const totallampu = totallampuSelect.value;
+  const combinedLampu = totallampu ? `${lampu} - ${totallampu}` : lampu;
+
+  const fan = fanSelect.value;
+  const totalfan = totalfanSelect.value;
+  const combinedFan = totalfan ? `${fan} - ${totalfan}` : fan;
+
+  const alarm = alarmSelect.value;
+  const jenisalarm = jenisalarmSelect.value;
+  const combinedAlarm = jenisalarm ? `${alarm} - ${jenisalarm}` : alarm;
+
+  // ===== Siapkan data untuk dikirim =====
+  const formData = new FormData(form);
+  formData.set("PLANT", combinedPlant);
+  formData.delete("UNIT");
+
+  formData.set("KATEGORY", combinedKategory);
+  formData.delete("BRAND");
+
+  formData.set("HANDLE", combinedHandle);
+  formData.delete("TOTALHANDLE");
+
+  formData.set("LAMPU", combinedLampu);
+  formData.delete("TOTALLAMPU");
+
+  formData.set("FAN", combinedFan);
+  formData.delete("TOTALFAN");
+
+  formData.set("ALARM", combinedAlarm);
+  formData.delete("JENISALARM");
+
+  // ===== Kirim data ke Google Sheet =====
+  fetch(scriptURL, {
+    method: "POST",
+    mode: "no-cors",
+    body: formData
+  })
+  .then(() => {
+    alert("✅ Data berhasil dikirim ke Google Sheet!");
+    form.reset();
+    unitSelect.style.display = "none";
+  })
+  .catch(err => alert("❌ Gagal mengirim: " + err))
+  .finally(() => {
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Kirim";
+  });
+});
+	
+  
+	
   </script>
+
 </body>
 </html>
-
-
-
-
