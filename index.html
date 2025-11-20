@@ -244,7 +244,7 @@
       </select>
     </div>
 	
-	<label>Tegangan Input AC(V) :</label>
+	<label>Tegangan Input AC(V) : isi "0" jik tidak ada AC(V)</label>
 	<div class="inline-group">
 	<input type="number" name="AC" placeholder="Tegangan" min="0" step="any" required>
 	<input type="number" name="GND" placeholder="GND Netral" min="0" step="any" required>
@@ -448,11 +448,12 @@
     <label>REPORT PM:</label>
     <textarea name="reportpm" placeholder="Tuliskan Report..." required></textarea>
 
+	<input type="hidden" name="Persentase" id="Persentase">
     <button type="submit" id="submitBtn">Kirim</button>
   </form>
 
   <script>
-    const scriptURL = "https://script.google.com/macros/s/AKfycby-VGx-dopEyW-GoH1XEOH1Mr2kNBYOqgQbLpuY7Nv6CVZutcT63eZtZS78zBxxGYxpgA/exec";
+    const scriptURL = "https://script.google.com/macros/s/AKfycbwdFlzNtJktXVt4nyRSJ_oi7uCaoVvnqngKTYsOalGfr4wOaAzxgeHi55r5FJjZ0vN-wQ/exec";
     const form = document.getElementById("maintenanceForm");
     const submitBtn = document.getElementById("submitBtn");
     const plantSelect = document.getElementById("PLANT");
@@ -765,107 +766,116 @@
 	  if (!apmLainnya.checked) apmLainnyaText.value = "";
 	});
 
-	// === Gabungkan hasil APM saat submit ===
-	form.addEventListener("submit", (e) => {
-	  e.preventDefault();
-
-	  // ... (kode lain tetap)
-
-	  // ===== Gabungkan hasil kondisi APM =====
-	  let apmResult = tindakanAPM.value;
-	  if (tindakanAPM.value === "Ada tindakan (APM)") {
-		const apmList = Array.from(document.querySelectorAll('input[name="APM"]:checked')).map(cb => cb.value);
-		if (apmLainnya.checked && apmLainnyaText.value.trim() !== "") {
-		  apmList.push("Lainnya: " + apmLainnyaText.value.trim());
-		}
-		apmResult += ": " + (apmList.length > 0 ? apmList.join(", ") : "Tidak ada checklist dipilih");
-	  }
-	  document.getElementById("apmGabung").value = apmResult;
-
-	  // lanjut kirim data ke Google Sheet seperti sebelumnya...
-	});
-
-
-	// === EVENT SUBMIT UTAMA ===
+// === EVENT SUBMIT FINAL ===
 form.addEventListener("submit", (e) => {
   e.preventDefault();
 
+  // -----------------------
+  // 1. HITUNG PERSENTASE
+  // -----------------------
+  const actionFields = [
+    "CLEANINGPANEL",
+    "CLEANINGFAN",
+    "CLEANINGFILTER",
+    "TIGHTENING",
+    "PENGGANTIAN_LAMPU",
+    "PENGGANTIAN_HANDLE",
+    "PERBAIKAN_WIRING",
+    "CEK_ALARM_PLC",
+    "CEK_TEGANGAN_PSU"
+  ];
 
-  // ===== Gabungkan hasil kondisi Wiring =====
-	let wiringResult = wiringSelect.value;
-	if (wiringResult === "Temuan") {
-	  const temuanList = Array
-		.from(document.querySelectorAll('input[name="wiringTemuan"]:checked'))
-		.map(cb => cb.value);
-	  wiringResult += ": " + (temuanList.length > 0 ? temuanList.join(", ") : "Tidak ada detail temuan");
-	}
-	wiringGabung.value = wiringResult;
+  let total = actionFields.length;
+  let selesaiCount = 0;
 
-  // ===== Nonaktifkan tombol kirim sementara =====
-  submitBtn.disabled = true;
-  submitBtn.textContent = "Mengirim...";
+  actionFields.forEach(name => {
+    const value = form.querySelector(`input[name="${name}"]:checked`)?.value || "";
+    if (value !== "" && value !== "OUTSTANDING") {
+      selesaiCount++;
+    }
+  });
 
-  // ===== Gabungkan dropdown bertingkat =====
-  const plant = plantSelect.value;
-  const unit = unitSelect.value;
-  const combinedPlant = unit ? `${plant} - ${unit}` : plant;
+  let persentase = Math.round((selesaiCount / total) * 100);
+  document.getElementById("Persentase").value = persentase + "%";
 
-  const kategory = kategorySelect.value;
-  const brand = brandSelect.value;
-  const combinedKategory = brand ? `${kategory} - ${brand}` : kategory;
 
-  const handle = handleSelect.value;
-  const totalhandle = totalhandleSelect.value;
-  const combinedHandle = totalhandle ? `${handle} - ${totalhandle}` : handle;
+  // -----------------------
+  // 2. Gabungkan Wiring Temuan
+  // -----------------------
+  let wiringResult = wiringSelect.value;
+  if (wiringResult === "Temuan") {
+    const temuanList = Array.from(document.querySelectorAll('input[name="wiringTemuan"]:checked'))
+      .map(cb => cb.value);
+    wiringResult += ": " + (temuanList.length ? temuanList.join(", ") : "Tidak ada detail temuan");
+  }
+  wiringGabung.value = wiringResult;
 
-  const lampu = lampuSelect.value;
-  const totallampu = totallampuSelect.value;
-  const combinedLampu = totallampu ? `${lampu} - ${totallampu}` : lampu;
 
-  const fan = fanSelect.value;
-  const totalfan = totalfanSelect.value;
-  const combinedFan = totalfan ? `${fan} - ${totalfan}` : fan;
+  // -----------------------
+  // 3. Gabungkan APM
+  // -----------------------
+  let apmResult = tindakanAPM.value;
+  if (tindakanAPM.value === "Ada tindakan (APM)") {
+    const apmList = Array.from(document.querySelectorAll('input[name="APM"]:checked'))
+      .map(cb => cb.value);
 
-  const alarm = alarmSelect.value;
-  const jenisalarm = jenisalarmSelect.value;
-  const combinedAlarm = jenisalarm ? `${alarm} - ${jenisalarm}` : alarm;
+    if (apmLainnya.checked && apmLainnyaText.value.trim() !== "") {
+      apmList.push("Lainnya: " + apmLainnyaText.value.trim());
+    }
 
-  // ===== Siapkan data untuk dikirim =====
+    apmResult += ": " + (apmList.length ? apmList.join(", ") : "Tidak ada checklist dipilih");
+  }
+  document.getElementById("apmGabung").value = apmResult;
+
+
+  // -----------------------
+  // 4. Gabungan Dropdown
+  //------------------------
   const formData = new FormData(form);
+
+  const combinedPlant = unitSelect.value ? `${plantSelect.value} - ${unitSelect.value}` : plantSelect.value;
   formData.set("PLANT", combinedPlant);
   formData.delete("UNIT");
 
+  const combinedKategory = brandSelect.value ? `${kategorySelect.value} - ${brandSelect.value}` : kategorySelect.value;
   formData.set("KATEGORY", combinedKategory);
   formData.delete("BRAND");
 
+  const combinedHandle = totalhandleSelect.value ? `${handleSelect.value} - ${totalhandleSelect.value}` : handleSelect.value;
   formData.set("HANDLE", combinedHandle);
   formData.delete("TOTALHANDLE");
 
+  const combinedLampu = totallampuSelect.value ? `${lampuSelect.value} - ${totallampuSelect.value}` : lampuSelect.value;
   formData.set("LAMPU", combinedLampu);
   formData.delete("TOTALLAMPU");
 
+  const combinedFan = totalfanSelect.value ? `${fanSelect.value} - ${totalfanSelect.value}` : fanSelect.value;
   formData.set("FAN", combinedFan);
   formData.delete("TOTALFAN");
 
-  formData.set("ALARM", combinedAlarm);
-  formData.delete("JENISALARM");
 
-  // ===== Kirim data ke Google Sheet =====
+  // -----------------------
+  // 5. KIRIM DATA KE GOOGLE SHEET
+  // -----------------------
+  submitBtn.disabled = true;
+  submitBtn.textContent = "Mengirim...";
+
   fetch(scriptURL, {
     method: "POST",
     mode: "no-cors",
     body: formData
   })
   .then(() => {
-    alert("✅ Data berhasil dikirim ke Google Sheet!");
+    alert("✅ Data berhasil dikirim!");
     form.reset();
     unitSelect.style.display = "none";
   })
-  .catch(err => alert("❌ Gagal mengirim: " + err))
+  .catch(err => alert("❌ Error: " + err))
   .finally(() => {
     submitBtn.disabled = false;
     submitBtn.textContent = "Kirim";
   });
+
 });
 	
   
