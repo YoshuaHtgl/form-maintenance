@@ -175,6 +175,9 @@
 		<option value="Refinery 4">Refinery 4</option>
 		<option value="Ilogs">Ilogs</option>
 		<option value="Workshop">Workshop</option>
+		<option value="Pelletizer">Pelletizer</option>
+		<option value="KCEP">KCEP</option>
+		<option value="KCP">KCP</option>
       </select>
 
       <select id="UNIT" name="UNIT" style="display:none;">
@@ -594,6 +597,33 @@
 		unitSelect.innerHTML += '<option value="Water In Oil">Water In Oil</option>';
         unitSelect.style.display = "block";
       }
+	  else if (selectedPlant === "Pelletizer") {
+        unitSelect.innerHTML += '<option value="Control Room">Control Room</option>';
+		unitSelect.innerHTML += '<option value="Weigher">Weigher</option>';
+		unitSelect.innerHTML += '<option value="JB1">JB1</option>';
+		unitSelect.innerHTML += '<option value="JB2">JB2</option>';
+		unitSelect.innerHTML += '<option value="JB3">JB3</option>';
+		unitSelect.innerHTML += '<option value="JB4">JB4</option>';
+		unitSelect.innerHTML += '<option value="JB5">JB5</option>';
+		unitSelect.innerHTML += '<option value="JB6">JB6</option>';
+		unitSelect.innerHTML += '<option value="JB7">JB7</option>';
+        unitSelect.style.display = "block";
+      }
+	  else if (selectedPlant === "KCEP") {
+        unitSelect.innerHTML += '<option value="Panel A">Panel A</option>';
+		unitSelect.innerHTML += '<option value="Panel B">Panel B</option>';
+		unitSelect.innerHTML += '<option value="Panel C">Panel C</option>';
+		unitSelect.innerHTML += '<option value="IO Silo">IO Silo</option>';
+		unitSelect.innerHTML += '<option value="Upgrade">Upgrade</option>';
+        unitSelect.style.display = "block";
+      }
+	  else if (selectedPlant === "KCP") {
+        unitSelect.innerHTML += '<option value="Weigher A">Weigher A</option>';
+		unitSelect.innerHTML += '<option value="Weigher B">Weigher B</option>';
+		unitSelect.innerHTML += '<option value="Weigher C">Weigher C</option>';
+		unitSelect.innerHTML += '<option value="Weigher D">Weigher D</option>';
+        unitSelect.style.display = "block";
+      }
 	  else {
         unitSelect.style.display = "none";
       }
@@ -844,4 +874,3 @@ form.addEventListener("submit", (e) => {
 
 </body>
 </html>
-
