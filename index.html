@@ -769,6 +769,21 @@
 // === EVENT SUBMIT FINAL ===
 form.addEventListener("submit", (e) => {
   e.preventDefault();
+  
+// === VALIDASI DESKRIPSI OUTSTANDING ===
+for (let radio of document.querySelectorAll("input[type=radio]")) {
+  if (radio.checked && radio.value === "OUTSTANDING") {
+    const targetId = radio.dataset.target;
+    const descRow = document.getElementById(targetId);
+    const textarea = descRow ? descRow.querySelector("textarea") : null;
+
+    if (textarea && textarea.value.trim() === "") {
+      alert("⚠️ Jika memilih OUTSTANDING, deskripsi wajib diisi!");
+      textarea.focus();
+      return; // stop submit
+    }
+  }
+}
 
   // -----------------------
   // 1. HITUNG PERSENTASE
