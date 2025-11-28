@@ -374,6 +374,17 @@
 		<tr id="PENGGANTIAN_HANDLE_DESC" class="out-desc">
 		  <td colspan="4"><textarea name="PENGGANTIAN_HANDLE_OUT_DESC" placeholder="Alasan outstanding..."></textarea></td>
 		</tr>
+		
+		<!-- Penggantian Fan -->
+		<tr>
+		  <td>Penggantian Fan</td>
+		  <td><input type="radio" name="PENGGANTIAN_FAN" value="OK NO ISSUE" data-target="PENGGANTIAN_FAN_DESC"></td>
+		  <td><input type="radio" name="PENGGANTIAN_FAN" value="SELESAI" data-target="PENGGANTIAN_FAN_DESC"></td>
+		  <td><input type="radio" name="PENGGANTIAN_FAN" value="OUTSTANDING" data-target="PENGGANTIAN_FAN_DESC"></td>
+		</tr>
+		<tr id="PENGGANTIAN_FAN_DESC" class="out-desc">
+		  <td colspan="4"><textarea name="PENGGANTIAN_FAN_OUT_DESC" placeholder="Alasan outstanding..."></textarea></td>
+		</tr>
 
 		<!-- Perbaikan Wiring -->
 		<tr>
@@ -453,7 +464,7 @@
   </form>
 
   <script>
-    const scriptURL = "https://script.google.com/macros/s/AKfycbyajN24cbrnr5aNpmr74FQe0lWtuN9eF4yRalK1LfFatwHS1zqbraUwoHvxGx9gnKW9/exec";
+    const scriptURL = "https://script.google.com/macros/s/AKfycbxXO5i8itUmSo8-meXYbYRgePW-ylejfbD1fV4hh7MkZAyOF02JuP7rj6A0_fKs5TBEcQ/exec";
     const form = document.getElementById("maintenanceForm");
     const submitBtn = document.getElementById("submitBtn");
     const plantSelect = document.getElementById("PLANT");
@@ -780,6 +791,7 @@ form.addEventListener("submit", (e) => {
     "TIGHTENING",
     "PENGGANTIAN_LAMPU",
     "PENGGANTIAN_HANDLE",
+	"PENGGANTIAN_FAN",
     "PERBAIKAN_WIRING",
     "CEK_ALARM_PLC",
     "CEK_TEGANGAN_PSU"
