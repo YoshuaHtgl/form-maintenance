@@ -244,6 +244,16 @@
       </select>
     </div>
 	
+	    <!-- NAMA PIC -->
+    <label>BATTERY:</label>
+    <select name="BATTERY" required>
+      <option value="">-- kondisi battery --</option>
+      <option value="Normal">Normal</option>
+      <option value="Tanpa Battery">Tanpa Battery</option>
+      <option value="Warning">Warning</option>
+    </select>
+	
+	
 	<label>Tegangan Input AC(V) : isi "0" jik tidak ada AC(V)</label>
 	<div class="inline-group">
 	<input type="number" name="AC" placeholder="Tegangan" min="0" step="any" required>
@@ -385,7 +395,7 @@
 		<tr id="PENGGANTIAN_FAN_DESC" class="out-desc">
 		  <td colspan="4"><textarea name="PENGGANTIAN_FAN_OUT_DESC" placeholder="Alasan outstanding..."></textarea></td>
 		</tr>
-
+		
 		<!-- Perbaikan Wiring -->
 		<tr>
 		  <td>Perbaikan Wiring IO/duck</td>
@@ -464,7 +474,7 @@
   </form>
 
   <script>
-    const scriptURL = "https://script.google.com/macros/s/AKfycbxXO5i8itUmSo8-meXYbYRgePW-ylejfbD1fV4hh7MkZAyOF02JuP7rj6A0_fKs5TBEcQ/exec";
+    const scriptURL = "https://script.google.com/macros/s/AKfycbxOrqsvN1ZH_rCyCmLP3Y_SmZQWYd8ckzFIFev42FdKTTtK2jBZD9FiTwLi-Qkxx-fsLA/exec";
     const form = document.getElementById("maintenanceForm");
     const submitBtn = document.getElementById("submitBtn");
     const plantSelect = document.getElementById("PLANT");
@@ -896,4 +906,3 @@ form.addEventListener("submit", (e) => {
 
 </body>
 </html>
-
