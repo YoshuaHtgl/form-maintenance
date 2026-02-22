@@ -820,7 +820,6 @@ form.addEventListener("submit", (e) => {
   let persentase = Math.round((selesaiCount / total) * 100);
   document.getElementById("Persentase").value = persentase + "%";
 
-
   // -----------------------
   // 2. Gabungkan Wiring Temuan
   // -----------------------
@@ -863,7 +862,7 @@ form.addEventListener("submit", (e) => {
   formData.set("KATEGORY", combinedKategory);
   formData.delete("BRAND");
 
-  const combinedHandle = totalhandleSelect.value ? `${handleSelect.value} - ${totalhandleSelect.value}` : handleSelect.value;
+  /*const combinedHandle = totalhandleSelect.value ? `${handleSelect.value} - ${totalhandleSelect.value}` : handleSelect.value;
   formData.set("HANDLE", combinedHandle);
   formData.delete("TOTALHANDLE");
 
@@ -873,7 +872,45 @@ form.addEventListener("submit", (e) => {
 
   const combinedFan = totalfanSelect.value ? `${fanSelect.value} - ${totalfanSelect.value}` : fanSelect.value;
   formData.set("FAN", combinedFan);
-  formData.delete("TOTALFAN");
+  formData.delete("TOTALFAN");*/
+  
+	// -----------------------
+	// HANDLE hanya kirim angka
+	// -----------------------
+	let handleValue = "0";
+
+	if (handleSelect.value === "Handle Rusak") {
+	  handleValue = totalhandleSelect.value || "0";
+	}
+
+	formData.set("HANDLE", handleValue);
+	formData.delete("TOTALHANDLE");
+  
+
+	// -----------------------
+	// Lampu hanya kirim angka
+	// -----------------------
+	let lampuValue = "0";
+
+	if (lampuSelect.value === "Lampu Rusak") {
+	  lampuValue = totallampuSelect.value || "0";
+	}
+
+	formData.set("LAMPU", lampuValue);
+	formData.delete("TOTALLAMPU");
+
+
+	// -----------------------
+	// FAN hanya kirim angka
+	// -----------------------
+	let fanValue = "0";
+
+	if (fanSelect.value === "Fan Rusak") {
+	  fanValue = totalfanSelect.value || "0";
+	}
+
+	formData.set("FAN", fanValue);
+	formData.delete("TOTALFAN");
 
 
   // -----------------------
