@@ -874,48 +874,51 @@ form.addEventListener("submit", (e) => {
   formData.set("FAN", combinedFan);
   formData.delete("TOTALFAN");*/
   
-	// -----------------------
-	// HANDLE hanya kirim angka
-	// -----------------------
-	let handleValue = "0";
+// -----------------------
+// HANDLE logic
+// -----------------------
+let handleValue = "";
 
-	if (handleSelect.value === "Handle Rusak") {
-	  handleValue = totalhandleSelect.value || "0";
-	}
+if (handleSelect.value === "Handle Rusak") {
+  handleValue = totalhandleSelect.value || "0";
+} else {
+  handleValue = handleSelect.value;
+}
 
-	formData.set("HANDLE", handleValue);
-	formData.delete("TOTALHANDLE");
-  
-
-	// -----------------------
-	// Lampu hanya kirim angka
-	// -----------------------
-	let lampuValue = "0";
-
-	if (lampuSelect.value === "Lampu Rusak") {
-	  lampuValue = totallampuSelect.value || "0";
-	}
-
-	formData.set("LAMPU", lampuValue);
-	formData.delete("TOTALLAMPU");
+formData.set("HANDLE", handleValue);
+formData.delete("TOTALHANDLE");
 
 
-	// -----------------------
-	// FAN hanya kirim angka
-	// -----------------------
-	let fanValue = "0";
+// -----------------------
+// LAMPU logic
+// -----------------------
+let lampuValue = "";
 
-	if (fanSelect.value === "Fan Rusak") {
-	  fanValue = totalfanSelect.value || "0";
-	}
+if (lampuSelect.value === "Lampu Rusak") {
+  lampuValue = totallampuSelect.value || "0";
+} else {
+  lampuValue = lampuSelect.value;
+}
 
-	formData.set("FAN", fanValue);
-	formData.delete("TOTALFAN");
+formData.set("LAMPU", lampuValue);
+formData.delete("TOTALLAMPU");
 
 
-  // -----------------------
-  // 5. KIRIM DATA KE GOOGLE SHEET
-  // -----------------------
+// -----------------------
+// FAN logic
+// -----------------------
+let fanValue = "";
+
+if (fanSelect.value === "Fan Rusak") {
+  fanValue = totalfanSelect.value || "0";
+} else {
+  fanValue = fanSelect.value;
+}
+
+formData.set("FAN", fanValue);
+formData.delete("TOTALFAN");
+
+
   submitBtn.disabled = true;
   submitBtn.textContent = "Mengirim...";
 
